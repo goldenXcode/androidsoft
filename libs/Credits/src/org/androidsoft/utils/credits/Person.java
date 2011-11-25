@@ -13,7 +13,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.androidsoft.games.utils.credits;
+package org.androidsoft.utils.credits;
 
 import android.graphics.Paint;
 
