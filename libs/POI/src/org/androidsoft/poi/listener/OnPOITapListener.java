@@ -12,31 +12,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.androidsoft.poi.service;
-
-import org.androidsoft.poi.model.POI;
+package org.androidsoft.poi.listener;
 
 /**
- * Limited POI object used for distance sorting in order to find nearest points
+ *
  * @author pierre
  */
-public class SortablePOI implements Comparable
+public interface OnPOITapListener
 {
-    long dist;
-    POI poi;
-
-    SortablePOI( POI poi , double lat , double lon )
-    {
-        this.poi = poi;
-        dist = LocationService.getDistance(poi, lat, lon);
-        
-    }
-
-    @Override
-    public int compareTo(Object t)
-    {
-        return (int) ( this.dist - ((SortablePOI) t).dist );
-    }
-
-
+    void onPOITap( int id );
 }

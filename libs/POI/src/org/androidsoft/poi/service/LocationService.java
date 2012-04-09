@@ -31,6 +31,7 @@ public class LocationService
 
     /**
      * Gets the location
+     *
      * @param context The context
      * @return The location
      */
@@ -45,6 +46,7 @@ public class LocationService
 
     /**
      * Sets the location
+     *
      * @param location The location
      */
     public static void setLocation(Location location)
@@ -64,7 +66,7 @@ public class LocationService
 
         String bestProvider = manager.getBestProvider(criteria, true);
         Location location = null;
-        if( bestProvider != null )
+        if (bestProvider != null)
         {
             location = manager.getLastKnownLocation(bestProvider);
         }
@@ -73,7 +75,7 @@ public class LocationService
             // Try with a coarse accuracy
             criteria.setAccuracy(Criteria.ACCURACY_COARSE);
             bestProvider = manager.getBestProvider(criteria, true);
-            if( bestProvider != null )
+            if (bestProvider != null)
             {
                 location = manager.getLastKnownLocation(bestProvider);
             }
@@ -85,7 +87,7 @@ public class LocationService
     public static long getDistance(POI poi, double latitude, double longitude)
     {
         float[] dist = new float[3];
-        Location.distanceBetween( poi.getLatitude(), poi.getLongitude(), latitude, longitude, dist );
+        Location.distanceBetween(poi.getLatitude(), poi.getLongitude(), latitude, longitude, dist);
         return (long) dist[0];
     }
 }

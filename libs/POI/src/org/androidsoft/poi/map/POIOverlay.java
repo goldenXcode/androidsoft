@@ -12,11 +12,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.androidsoft.poi.ui.activity;
+package org.androidsoft.poi.map;
 
+import org.androidsoft.poi.listener.OnPOITapListener;
 import android.graphics.drawable.Drawable;
 import com.google.android.maps.MapView;
-import com.google.android.maps.OverlayItem;
 import com.readystatesoftware.mapviewballoons.BalloonItemizedOverlay;
 import com.readystatesoftware.mapviewballoons.BalloonOverlayResources;
 import java.util.ArrayList;
@@ -25,29 +25,31 @@ import java.util.ArrayList;
  *
  * @author pierre
  */
-public class POIOverlay extends BalloonItemizedOverlay<OverlayItem>
+public class POIOverlay extends BalloonItemizedOverlay<POIOverlayItem>
 {
 
-    private ArrayList<OverlayItem> mOverlays;
+    private ArrayList<POIOverlayItem> mOverlays;
     private POIOverlayResources mRes;
+    private OnPOITapListener mListener;
 
-    public POIOverlay(Drawable defaultMarker, MapView mapView, POIOverlayResources res)
+    public POIOverlay(Drawable defaultMarker, MapView mapView, POIOverlayResources res , OnPOITapListener listener )
     {
         super(boundCenterBottom(defaultMarker), mapView);
-        mOverlays = new ArrayList<OverlayItem>();
+        mOverlays = new ArrayList<POIOverlayItem>();
         mRes = res;
+        mListener = listener;
         setBalloonBottomOffset( res.getBottomOffset() );
         populate();
     }
 
-    public void addOverlay(OverlayItem overlay)
+    public void addOverlay(POIOverlayItem overlay)
     {
         mOverlays.add(overlay);
         populate();
     }
 
     @Override
-    protected OverlayItem createItem(int i)
+    protected POIOverlayItem createItem(int i)
     {
         return mOverlays.get(i);
     }
@@ -88,4 +90,13 @@ public class POIOverlay extends BalloonItemizedOverlay<OverlayItem>
         res.setCloseId(mRes.getCloseId());
         return res;
     }
+
+    @Override
+    protected boolean onBalloonTap(int index, POIOverlayItem item)
+    {
+        mListener.onPOITap( item.getId() );
+        return super.onBalloonTap(index, item);
+    }
+    
+    
 }

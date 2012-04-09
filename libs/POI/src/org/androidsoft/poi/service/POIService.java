@@ -36,15 +36,27 @@ public abstract class POIService<T>
 
     public abstract T newInstance( String[] record );
     
+    private List<T> mCachedList;
+
+    /**
+     * Get all POIs loaded from a CSV file stored as an asset resource.
+     * @param context The context
+     * @return The list of POIs
+     */
     public List<T> getPOIs( Context context)
     {
+        if( mCachedList != null )
+        {
+            return mCachedList;
+        }
+        
         InputStream is = null;
         try
         {
             is = context.getAssets().open( getAssetFile() );
             CSVReader reader = new CSVReader(new InputStreamReader( is ) , ';' );
             List<String[]> records = reader.readAll();
-            return getPOIs( records );
+            mCachedList = getPOIs( records );
         }
         catch (IOException ex)
         {
@@ -61,10 +73,19 @@ public abstract class POIService<T>
                 Logger.getLogger(POIService.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return null;
+        return mCachedList;
       
     }
     
+    /**
+     * Filter a list of POIs by proximity to a given point
+     * @param list The list of POIs
+     * @param latitude The latitude of the point
+     * @param longitude The longitude of the point
+     * @param max Max POIs of the returned list
+     * @param radius The maximum distance between the point and the POI
+     * @return 
+     */
     public static List<POI> getNearestPOI( List<POI> list , double latitude, double longitude, int max , long radius )
     {
         
@@ -94,7 +115,7 @@ public abstract class POIService<T>
         return listNearest;
     }
     
-    List<T> getPOIs(List<String[]> records )
+    private List<T> getPOIs(List<String[]> records )
     {
         List<T> listPOIs = new ArrayList<T>();
         
@@ -104,8 +125,6 @@ public abstract class POIService<T>
             listPOIs.add(poi);
         }
         return listPOIs;
-        
-    }
-
+    }    
     
 }

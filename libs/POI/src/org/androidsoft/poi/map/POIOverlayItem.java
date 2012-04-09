@@ -12,31 +12,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.androidsoft.poi.service;
+package org.androidsoft.poi.map;
 
-import org.androidsoft.poi.model.POI;
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.OverlayItem;
 
 /**
- * Limited POI object used for distance sorting in order to find nearest points
+ *
  * @author pierre
  */
-public class SortablePOI implements Comparable
+public class POIOverlayItem extends OverlayItem
 {
-    long dist;
-    POI poi;
-
-    SortablePOI( POI poi , double lat , double lon )
+    private int mId;
+    
+    public POIOverlayItem( GeoPoint point , String title , String description , int id )
     {
-        this.poi = poi;
-        dist = LocationService.getDistance(poi, lat, lon);
-        
+        super( point , title , description );
+        mId = id;
     }
-
-    @Override
-    public int compareTo(Object t)
+    
+    public int getId()
     {
-        return (int) ( this.dist - ((SortablePOI) t).dist );
+        return mId;
     }
-
-
 }

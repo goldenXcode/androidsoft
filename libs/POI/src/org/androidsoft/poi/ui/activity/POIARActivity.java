@@ -18,8 +18,6 @@ package org.androidsoft.poi.ui.activity;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
-import android.widget.Toast;
 import com.jwetherell.augmented_reality.activity.AugmentedReality;
 import com.jwetherell.augmented_reality.data.ARData;
 import com.jwetherell.augmented_reality.data.NetworkDataSource;
@@ -28,12 +26,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.*;
+import org.androidsoft.poi.ar.POIMarker;
+import org.androidsoft.poi.listener.OnPOITapListener;
 
 /**
  *
  * @author pierre
  */
-public class POIARActivity extends AugmentedReality
+public abstract class POIARActivity extends AugmentedReality implements OnPOITapListener
 {
 
     private static final String TAG = "Demo";
@@ -81,9 +81,8 @@ public class POIARActivity extends AugmentedReality
     @Override
     protected void markerTouched(Marker marker)
     {
-        Toast t = Toast.makeText(getApplicationContext(), marker.getName(), Toast.LENGTH_SHORT);
-        t.setGravity(Gravity.CENTER, 0, 0);
-        t.show();
+        POIMarker m = (POIMarker) marker;
+        onPOITap(m.getId());
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.jwetherell.augmented_reality.ui;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 
 import com.jwetherell.augmented_reality.camera.CameraModel;
 import com.jwetherell.augmented_reality.common.PitchAzimuthCalculator;
@@ -23,11 +22,8 @@ import com.jwetherell.augmented_reality.ui.objects.PaintableText;
 public class Radar {
     public static final float RADIUS = 48;
     
-    private static final int LINE_COLOR = Color.argb(150,0,0,220);
     private static final float PAD_X = 10;
     private static final float PAD_Y = 20;
-    private static final int RADAR_COLOR = Color.argb(100, 0, 0, 200);
-    private static final int TEXT_COLOR = Color.rgb(255,255,255);
     private static final int TEXT_SIZE = 12;
 
     private static ScreenPosition leftRadarLine = null;
@@ -45,6 +41,7 @@ public class Radar {
     public Radar() {
         if (leftRadarLine==null) leftRadarLine = new ScreenPosition();
         if (rightRadarLine==null) rightRadarLine = new ScreenPosition();
+        
     }
 
     /**
@@ -71,7 +68,7 @@ public class Radar {
     	if (canvas==null) throw new NullPointerException();
     	
         if (circleContainer==null) {
-            PaintableCircle paintableCircle = new PaintableCircle(RADAR_COLOR,RADIUS,true);
+            PaintableCircle paintableCircle = new PaintableCircle( CustomParams.getRadarColor(),RADIUS,true);
             circleContainer = new PaintablePosition(paintableCircle,PAD_X+RADIUS,PAD_Y+RADIUS,0,1);
         }
         circleContainer.paint(canvas);
@@ -109,7 +106,7 @@ public class Radar {
 
             float leftX = leftRadarLine.getX()-(PAD_X+RADIUS);
             float leftY = leftRadarLine.getY()-(PAD_Y+RADIUS);
-            PaintableLine leftLine = new PaintableLine(LINE_COLOR, leftX, leftY);
+            PaintableLine leftLine = new PaintableLine( CustomParams.getRadarLineColor(), leftX, leftY);
             leftLineContainer = new PaintablePosition(  leftLine, 
                                                         PAD_X+RADIUS, 
                                                         PAD_Y+RADIUS, 
@@ -126,7 +123,7 @@ public class Radar {
             
             float rightX = rightRadarLine.getX()-(PAD_X+RADIUS);
             float rightY = rightRadarLine.getY()-(PAD_Y+RADIUS);
-            PaintableLine rightLine = new PaintableLine(LINE_COLOR, rightX, rightY);
+            PaintableLine rightLine = new PaintableLine( CustomParams.getRadarLineColor(), rightX, rightY);
             rightLineContainer = new PaintablePosition( rightLine, 
                                                         PAD_X+RADIUS, 
                                                         PAD_Y+RADIUS, 
@@ -170,8 +167,8 @@ public class Radar {
     private void radarText(Canvas canvas, String txt, float x, float y, boolean bg) {
     	if (canvas==null || txt==null) throw new NullPointerException();
     	
-        if (paintableText==null) paintableText = new PaintableText(txt,TEXT_COLOR,TEXT_SIZE,bg);
-        else paintableText.set(txt,TEXT_COLOR,TEXT_SIZE,bg);
+        if (paintableText==null) paintableText = new PaintableText(txt,CustomParams.getRadarTextColor(),TEXT_SIZE,bg);
+        else paintableText.set(txt,CustomParams.getRadarTextColor(),TEXT_SIZE,bg);
         
         if (paintedContainer==null) paintedContainer = new PaintablePosition(paintableText,x,y,0,1);
         else paintedContainer.set(paintableText,x,y,0,1);

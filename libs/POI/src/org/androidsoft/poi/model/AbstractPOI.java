@@ -31,6 +31,7 @@ public abstract class AbstractPOI implements POI
     /**
      * @return the id
      */
+    @Override
     public int getId()
     {
         return mId;
@@ -47,6 +48,7 @@ public abstract class AbstractPOI implements POI
     /**
      * @return the _lat
      */
+    @Override
     public double getLatitude()
     {
         return mLat;
@@ -63,6 +65,7 @@ public abstract class AbstractPOI implements POI
     /**
      * @return the _lon
      */
+    @Override
     public double getLongitude()
     {
         return mLon;
@@ -76,16 +79,19 @@ public abstract class AbstractPOI implements POI
         mLon = lon;
     }
     
+    @Override
     public Drawable getIcon()
     {
         return null;
     }
 
+    @Override
     public long getDistance()
     {
         return mDistance;
     }
     
+    @Override
     public void setDistance( long distance )
     {
         mDistance = distance;

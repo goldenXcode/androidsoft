@@ -3,6 +3,7 @@ package com.jwetherell.augmented_reality.activity;
 import java.text.DecimalFormat;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.os.Bundle;
@@ -44,6 +45,14 @@ public class AugmentedReality extends SensorsActivity implements OnTouchListener
     public static float TWENTY_PERCENT = 2f*TEN_PERCENT;
     public static float EIGHTY_PERCENTY = 4f*TWENTY_PERCENT;
     
+    protected Drawable getCustomSeekbarDrawable() {
+        return null;
+    }
+            
+    protected Drawable getCustomThumbDrawable() {
+        return null;
+    }
+            
     
 	/**
 	 * {@inheritDoc}
@@ -59,6 +68,16 @@ public class AugmentedReality extends SensorsActivity implements OnTouchListener
         myZoomBar.setMax(100);
         myZoomBar.setProgress(25);
         myZoomBar.setOnSeekBarChangeListener(myZoomBarOnSeekBarChangeListener);
+        Drawable progress = getCustomSeekbarDrawable();
+        if( progress != null )
+        {
+            myZoomBar.setProgressDrawable(progress);
+        }
+        Drawable thumb = getCustomThumbDrawable();
+        if( thumb != null )
+        {
+            myZoomBar.setThumb(thumb);
+        }
 
         frameLayout = new FrameLayout(this);
         frameLayout.setMinimumWidth(3000);

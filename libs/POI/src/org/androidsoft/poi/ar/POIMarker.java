@@ -12,31 +12,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.androidsoft.poi.service;
+package org.androidsoft.poi.ar;
 
-import org.androidsoft.poi.model.POI;
+import android.graphics.Bitmap;
+import com.jwetherell.augmented_reality.ui.IconMarker;
 
 /**
- * Limited POI object used for distance sorting in order to find nearest points
+ *
  * @author pierre
  */
-public class SortablePOI implements Comparable
+public class POIMarker extends IconMarker
 {
-    long dist;
-    POI poi;
-
-    SortablePOI( POI poi , double lat , double lon )
+    private int mId;
+    
+    public POIMarker( String name , double lat, double lon, double alt, int color , Bitmap bitmap , int id  )
     {
-        this.poi = poi;
-        dist = LocationService.getDistance(poi, lat, lon);
-        
+        super( name , lat , lon , alt , color , bitmap );
+        mId = id; 
     }
-
-    @Override
-    public int compareTo(Object t)
+    
+    public int getId()
     {
-        return (int) ( this.dist - ((SortablePOI) t).dist );
+        return mId;
     }
-
-
 }
+    

@@ -24,7 +24,7 @@ public interface POI
 {
     int getId();
     String getTitle();
-    String getDesciption();
+    String getDescription();
     double getLatitude();
     double getLongitude();
     long getDistance();

@@ -14,6 +14,8 @@
  */
 package org.androidsoft.poi.ui.activity;
 
+import org.androidsoft.poi.map.POIOverlayResources;
+import org.androidsoft.poi.map.POIOverlay;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
@@ -22,21 +24,28 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import com.google.android.maps.*;
 import java.util.List;
+import org.androidsoft.poi.listener.OnPOITapListener;
+import org.androidsoft.poi.map.POIOverlayItem;
 import org.androidsoft.poi.model.POI;
 
 /**
  *
  * @author pierre
  */
-public abstract class POIMapActivity extends MapActivity
+public abstract class POIMapActivity extends MapActivity implements OnPOITapListener
 {
-    private static final int ZOOM_DEFAULT = 18;
+    public static final String EXTRA_POINT_LAT = "map_center_lat";
+    public static final String EXTRA_POINT_LON = "map_center_lon";
+
+    private static final int ZOOM_DEFAULT = 15;
+    private static final int ZOOM_FOCUSED = 19;
     private static final boolean MODE_SATELLITE = false;
 
+    private int mZoom;
     private MapView mMapView;
     private MapController mMapController;
     private LocationManager mLocationManager;
-    private GeoPoint mPoint;
+    private GeoPoint mMapCenter;
     private List<Overlay> mMapOverlays;
     private POIOverlay mItemizedOverlay;
 
@@ -54,26 +63,40 @@ public abstract class POIMapActivity extends MapActivity
 
         mMapView = (MapView) findViewById(getMapViewId());
         mMapView.setBuiltInZoomControls(true);
-        mMapController = mMapView.getController();
-        mMapController.setZoom( getZoom());
-        mMapView.setSatellite( getSatellite() );
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         String provider = mLocationManager.getBestProvider(criteria, true);
         Location location = mLocationManager.getLastKnownLocation(provider);
-        if (location != null)
+
+        double intentLatitude = getIntent().getDoubleExtra(EXTRA_POINT_LAT, 0.0);
+        double intentLongitude = getIntent().getDoubleExtra(EXTRA_POINT_LON, 0.0);
+
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mZoom = getZoom();
+        
+        if ((intentLatitude != 0.0) && (intentLongitude != 0.0))
         {
-            mPoint = convertGeoPoint(location);
+            // the activity has been lauched with a commune's coordinate in extras
+            mMapCenter = convertLatLon(intentLatitude, intentLongitude);
+            mZoom = getFocusedZoom();
+
+        }
+        else if (location != null)
+        {
+            mMapCenter = convertGeoPoint(location);
         }
         else
         {
             double lat = 48.87153740744375;
             double lon = 2.342920216006007;
-            mPoint = convertLatLon(lat, lon);
+            mMapCenter = convertLatLon(lat, lon);
         }
-        mMapController.animateTo(mPoint);
+        mMapController = mMapView.getController();
+        mMapController.setZoom( mZoom );
+        mMapView.setSatellite( getSatellite() );
+        mMapController.animateTo(mMapCenter);
 
         setPOIOverlay();
 
@@ -90,6 +113,11 @@ public abstract class POIMapActivity extends MapActivity
     protected int getZoom()
     {
         return ZOOM_DEFAULT;
+    }
+    
+    protected int getFocusedZoom()
+    {
+        return ZOOM_FOCUSED;
     }
     
     protected boolean getSatellite()
@@ -119,12 +147,13 @@ public abstract class POIMapActivity extends MapActivity
     {
         mMapOverlays = mMapView.getOverlays();
         Drawable marker = getResources().getDrawable(getMarkerRes());
-        mItemizedOverlay = new POIOverlay(marker , mMapView , getOverlayResources() );
+        mItemizedOverlay = new POIOverlay(marker , mMapView , getOverlayResources() , this );
 
         for (POI poi : getPOIs() )
         {
             GeoPoint point = new GeoPoint( (int) (poi.getLatitude() * 1E6) , (int) (poi.getLongitude() * 1E6) );
-            mItemizedOverlay.addOverlay( new OverlayItem( point , poi.getTitle() , poi.getDesciption()));
+            POIOverlayItem item = new POIOverlayItem( point , poi.getTitle() , poi.getDescription() , poi.getId());
+            mItemizedOverlay.addOverlay( item );
         }
         mMapOverlays.add(mItemizedOverlay);
 
