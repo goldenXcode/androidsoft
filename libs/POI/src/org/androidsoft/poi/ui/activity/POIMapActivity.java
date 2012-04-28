@@ -25,7 +25,7 @@ import android.os.Bundle;
 import com.google.android.maps.*;
 import java.util.List;
 import org.androidsoft.poi.listener.OnPOITapListener;
-import org.androidsoft.poi.map.POIOverlayItem;
+import org.androidsoft.poi.map.GeoUtils;
 import org.androidsoft.poi.model.POI;
 
 /**
@@ -34,25 +34,28 @@ import org.androidsoft.poi.model.POI;
  */
 public abstract class POIMapActivity extends MapActivity implements OnPOITapListener
 {
+
     public static final String EXTRA_POINT_LAT = "map_center_lat";
     public static final String EXTRA_POINT_LON = "map_center_lon";
-
     private static final int ZOOM_DEFAULT = 15;
     private static final int ZOOM_FOCUSED = 19;
     private static final boolean MODE_SATELLITE = false;
-
     private int mZoom;
     private MapView mMapView;
     private MapController mMapController;
     private LocationManager mLocationManager;
     private GeoPoint mMapCenter;
     private List<Overlay> mMapOverlays;
-    private POIOverlay mItemizedOverlay;
-
+    private MyLocationOverlay mMyLocationOverlay;
+    
     public abstract int getMapViewId();
+
     public abstract int getLayout();
+
     public abstract int getMarkerRes();
+
     public abstract List<POI> getPOIs();
+
     public abstract POIOverlayResources getOverlayResources();
 
     @Override
@@ -75,30 +78,32 @@ public abstract class POIMapActivity extends MapActivity implements OnPOITapList
 
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mZoom = getZoom();
-        
+
         if ((intentLatitude != 0.0) && (intentLongitude != 0.0))
         {
             // the activity has been lauched with a commune's coordinate in extras
-            mMapCenter = convertLatLon(intentLatitude, intentLongitude);
+            mMapCenter = GeoUtils.convertLatLon(intentLatitude, intentLongitude);
             mZoom = getFocusedZoom();
-
         }
         else if (location != null)
         {
-            mMapCenter = convertGeoPoint(location);
+            mMapCenter = GeoUtils.convertGeoPoint(location);
         }
         else
         {
             double lat = 48.87153740744375;
             double lon = 2.342920216006007;
-            mMapCenter = convertLatLon(lat, lon);
+            mMapCenter = GeoUtils.convertLatLon(lat, lon);
         }
         mMapController = mMapView.getController();
-        mMapController.setZoom( mZoom );
-        mMapView.setSatellite( getSatellite() );
+        mMapController.setZoom(mZoom);
+        mMapView.setSatellite(getSatellite());
         mMapController.animateTo(mMapCenter);
 
-        setPOIOverlay();
+        mMapOverlays = mMapView.getOverlays();
+        mMapOverlays.add(getPOIOverlay(mMapView));
+        mMyLocationOverlay = getMyLocationOverlay(mMapView);
+        mMapOverlays.add(mMyLocationOverlay);
 
         mMapView.invalidate();
     }
@@ -109,55 +114,45 @@ public abstract class POIMapActivity extends MapActivity implements OnPOITapList
         return false;
     }
 
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        mMyLocationOverlay.enableMyLocation();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        mMyLocationOverlay.disableMyLocation();
+    }
 
     protected int getZoom()
     {
         return ZOOM_DEFAULT;
     }
-    
+
     protected int getFocusedZoom()
     {
         return ZOOM_FOCUSED;
     }
-    
+
     protected boolean getSatellite()
     {
         return MODE_SATELLITE;
     }
 
-    private GeoPoint convertGeoPoint(Location location)
+    protected Overlay getPOIOverlay(MapView mapView)
     {
-        if (location != null)
-        {
-            return convertLatLon(location.getLatitude(), location.getLongitude());
-        }
-        return null;
-
-    }
-
-    private GeoPoint convertLatLon(double latitude, double longitude)
-    {
-        int lat = (int) (latitude * 1E6);
-        int lng = (int) (longitude * 1E6);
-        return new GeoPoint(lat, lng);
-
-    }
-
-    private void setPOIOverlay()
-    {
-        mMapOverlays = mMapView.getOverlays();
         Drawable marker = getResources().getDrawable(getMarkerRes());
-        mItemizedOverlay = new POIOverlay(marker , mMapView , getOverlayResources() , this );
-
-        for (POI poi : getPOIs() )
-        {
-            GeoPoint point = new GeoPoint( (int) (poi.getLatitude() * 1E6) , (int) (poi.getLongitude() * 1E6) );
-            POIOverlayItem item = new POIOverlayItem( point , poi.getTitle() , poi.getDescription() , poi.getId());
-            mItemizedOverlay.addOverlay( item );
-        }
-        mMapOverlays.add(mItemizedOverlay);
-
-        mMapView.postInvalidate();
+        POIOverlay overlay = new POIOverlay(marker, mapView, getOverlayResources(), this);
+        overlay.addOverlayItems(getPOIs());
+        return overlay;
     }
 
+    protected MyLocationOverlay getMyLocationOverlay(MapView mapView)
+    {
+        return new MyLocationOverlay(this, mapView);
+    }
 }

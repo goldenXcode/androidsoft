@@ -16,10 +16,13 @@ package org.androidsoft.poi.map;
 
 import org.androidsoft.poi.listener.OnPOITapListener;
 import android.graphics.drawable.Drawable;
+import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 import com.readystatesoftware.mapviewballoons.BalloonItemizedOverlay;
 import com.readystatesoftware.mapviewballoons.BalloonOverlayResources;
 import java.util.ArrayList;
+import java.util.List;
+import org.androidsoft.poi.model.POI;
 
 /**
  *
@@ -42,9 +45,20 @@ public class POIOverlay extends BalloonItemizedOverlay<POIOverlayItem>
         populate();
     }
 
-    public void addOverlay(POIOverlayItem overlay)
+    public void addOverlayItem(POIOverlayItem item)
     {
-        mOverlays.add(overlay);
+        mOverlays.add(item);
+        populate();
+    }
+    
+    public void addOverlayItems( List<POI> listPOI )
+    {
+        for (POI poi : listPOI )
+        {
+            GeoPoint point = new GeoPoint( (int) (poi.getLatitude() * 1E6) , (int) (poi.getLongitude() * 1E6) );
+            POIOverlayItem item = new POIOverlayItem( point , poi.getTitle() , poi.getDescription() , poi.getId());
+            mOverlays.add(item);
+        }
         populate();
     }
 
