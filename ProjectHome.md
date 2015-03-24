@@ -1,0 +1,1 @@
+Games and tools for Android Platform provided by http://www.androidsoft.org
